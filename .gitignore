@@ -1,0 +1,17 @@
+# VS Code settings
+.vscode/
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Logs
+*.log
+
+# Node modules (if you later add npm packages)
+node_modules/
+
+# Env files (if you use API keys or settings later)
+.env
