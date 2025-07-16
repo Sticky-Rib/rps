@@ -30,3 +30,8 @@ GitHub Pages link: _coming soon_
 ## Status
 
 This is an early-stage prototype. Core mechanics are in place. Additional features and tuning in progress.
+
+## License
+
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).  
+You are free to share and adapt the material for non-commercial use, with appropriate credit.
