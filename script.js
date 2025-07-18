@@ -344,20 +344,16 @@ function loop() {
 // ===============================
 
 document.getElementById('resetButton').addEventListener('click', () => {
-  // Reset sliders to default values
-  speedSlider.value = 1;
-  speedValue.textContent = '1.0x';
-  speedMultiplier = 1;
+  // Use current slider values (do not reset them)
+  const speed = parseFloat(speedSlider.value);
+  const aggression = parseInt(aggressionSlider.value);
+  const count = getSpriteCountFromSlider();
 
-  aggressionSlider.value = 50;
-  aggressionValue.textContent = '50%';
-  aggressionRatio = 0.6;
-
-  // Reset simulation state
-  sprites.length = 0;
+  speedMultiplier = speed;
+  aggressionRatio = 0.4 + (0.6 - 0.4) * (aggression / 100);
   winner = null;
 
-  resetSprites(50);
+  resetSprites(count);
 });
 
 loop();
