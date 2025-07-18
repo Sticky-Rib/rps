@@ -31,6 +31,9 @@ const DEFAULT_DENSITY = 10; // Midpoint → 50 each
 const MAX_SPRITES_PER_TYPE = 500;
 const MIN_SPRITES_PER_TYPE = 1;
 
+const BASE_JITTER = 0.1;
+const BURST_CHANCE = 0.015;
+const BURST_STRENGTH = 1.5;
 
 const preyOf = {
   rock: 'scissors',
@@ -74,7 +77,7 @@ aggressionSlider.addEventListener('input', () => {
   aggressionValue.textContent = `${sliderValue}%`;
 
   const ratio = sliderValue / 100;
-  aggressionRatio = 0.4 + (0.6 - 0.4) * ratio;
+  aggressionRatio = 0.2 + (0.8 - 0.2) * ratio;
 });
 
 // --- Density Slider ---
@@ -132,6 +135,10 @@ class Sprite {
   }
 
   update() {
+    if (Math.random() < BURST_CHANCE) {
+      this.dx += (Math.random() - 0.5) * BURST_STRENGTH;
+      this.dy += (Math.random() - 0.5) * BURST_STRENGTH;
+    }
     this.x += this.dx * this.speed * speedMultiplier;
     this.y += this.dy * this.speed * speedMultiplier;
 
@@ -192,8 +199,8 @@ class Sprite {
       moveY -= (predatorThreat.dy / predatorThreat.dist) * (1 - aggressionRatio);
     }
 
-    moveX += (Math.random() - 0.5) * 0.1;
-    moveY += (Math.random() - 0.5) * 0.1;
+    moveX += (Math.random() - 0.5) * BASE_JITTER;
+    moveY += (Math.random() - 0.5) * BASE_JITTER;
 
     const mag = Math.hypot(moveX, moveY);
     if (mag > 0) {
