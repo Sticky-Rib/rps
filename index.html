@@ -1,52 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rock Paper Scissors Emulator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 20px;
-    }
-
-    canvas {
-      border: 1px solid black;
-      display: block;
-      margin: 0 auto;
-    }
-
-    #controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .slider-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    label {
-      font-weight: bold;
-    }
-	
-	button {
-      padding: 8px 16px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <canvas id="gameCanvas"></canvas>
 
-  <!-- 🎛️ Sliders go here -->
   <div id="controls">
     <div class="slider-group">
       <label for="speedSlider">Speed:</label>
@@ -59,11 +22,10 @@
       <input type="range" id="aggressionSlider" min="0" max="100" value="50">
       <span id="aggressionValue">50%</span>
     </div>
-	
-	<button id="resetButton">🔁 Reset</button>
+
+    <button id="resetButton">🔁 Reset</button>
   </div>
 
-  <!-- Your JS file -->
   <script src="script.js"></script>
 </body>
 </html>

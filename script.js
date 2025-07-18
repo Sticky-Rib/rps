@@ -1,5 +1,16 @@
+//1. Get Canvas
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+//2. Resize Canvas
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// 3. Declare global vars, sliders, classes...
 let winner = null;
 let speedMultiplier = 1;
 
