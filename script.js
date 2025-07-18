@@ -223,53 +223,17 @@ function drawCounters() {
   ctx.fillText(`✂️ Scissors: ${counts.scissors}`, 10, 60);
 }
 
-const winPattern = [
-  // W
-  [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],
-  [1,7],
-  [2,6],
-  [3,5],
-  [4,6],
-  [5,7],
-  [6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6],[6,7],[6,8],
 
-  // I
-  [8,0],[9,0],[10,0],[9,1],[9,2],[9,3],[9,4],[9,5],[9,6],[9,7],[8,8],[9,8],[10,8],
+function applyVictoryDrift(sprite) {
+  // Apply gentle drift once the game ends
+  sprite.dx += (Math.random() - 0.5) * 0.05;
+  sprite.dy += (Math.random() - 0.5) * 0.05;
 
-  // N
-  [12,0],[12,1],[12,2],[12,3],[12,4],[12,5],[12,6],[12,7],[12,8],
-  [13,1],
-  [14,2],
-  [15,3],
-  [16,4],
-  [17,5],
-  [18,6],
-  [19,7],
-  [20,8],
-  [20,0],[20,1],[20,2],[20,3],[20,4],[20,5],[20,6],[20,7],[20,8],
-];
-
-function arrangeVictoryPattern(type) {
-  const spacing = 14;
-  const startX = canvas.width / 2 - 10 * spacing;
-  const startY = canvas.height / 2 - 4 * spacing;
-
-  const winningSprites = sprites.filter(s => s.type === type);
-
-  for (let i = 0; i < winPattern.length && i < winningSprites.length; i++) {
-    const [px, py] = winPattern[i];
-    const sprite = winningSprites[i];
-    const targetX = startX + px * spacing;
-    const targetY = startY + py * spacing;
-    sprite.setTarget(targetX, targetY);
-  }
-
-  // Overflow sprites = float around the letters
-  for (let i = winPattern.length; i < winningSprites.length; i++) {
-    const sprite = winningSprites[i];
-    const targetX = startX + Math.random() * spacing * 22;
-    const targetY = startY + Math.random() * spacing * 10;
-    sprite.setTarget(targetX, targetY);
+  // Smooth out speed
+  const mag = Math.hypot(sprite.dx, sprite.dy);
+  if (mag > 0.5) {
+    sprite.dx *= 0.95;
+    sprite.dy *= 0.95;
   }
 }
 
@@ -306,15 +270,15 @@ function loop() {
     const remainingTypes = new Set(sprites.map(s => s.type));
     if (remainingTypes.size === 1) {
       winner = [...remainingTypes][0];
-      arrangeVictoryPattern(winner);
-    }
+      }
   }
 
   // Either animate victory or regular draw
   for (let sprite of sprites) {
     if (winner) {
-      sprite.moveToTarget();
+      applyVictoryDrift(sprite);
     }
+    sprite.update();
     sprite.draw();
   }
 
