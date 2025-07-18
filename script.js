@@ -81,7 +81,7 @@ aggressionSlider.addEventListener('input', () => {
   aggressionValue.textContent = `${sliderValue}%`;
 
   const ratio = sliderValue / 100;
-  aggressionRatio = 0.2 + (0.8 - 0.2) * ratio;
+  aggressionRatio = 0.4 + (0.6 - 0.4) * ratio;
 });
 
 // --- Density Slider ---
@@ -344,7 +344,8 @@ function loop() {
     ctx.fillStyle = 'black';
     ctx.font = '32px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(`${winner.toUpperCase()} WINS! 🎉`, canvas.width / 2, 80);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${winner.toUpperCase()} WINS! 🎉`, canvas.width / 2, canvas.height / 2);
   }
   
   requestAnimationFrame(loop);
