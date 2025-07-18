@@ -1,0 +1,51 @@
+/* Reset margins and prevent scroll */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Make canvas flush to edges */
+canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* (Optional) Keep UI clean later */
+* {
+  box-sizing: border-box;
+}
+
+#controls {
+  position: absolute;
+  bottom: 16px; /* ~1cm up */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+label {
+  font-weight: bold;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+}
