@@ -1,9 +1,15 @@
-//1. Get Canvas
+// ===============================
+// Canvas Setup
+// ===============================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+
+// Start FPS monitor
 fpsMonitor.start(ctx);
 
-//2. Resize Canvas
+// ===============================
+// Responsive Canvas Size
+// ===============================
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -11,9 +17,20 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// 3. Declare global vars, sliders, classes...
+// ===============================
+// Global State and Constants
+// ===============================
 let winner = null;
 let speedMultiplier = 1;
+let aggressionRatio = 0.6; // initial 60% attack
+
+const DEFAULT_SPEED = 1.0;
+const DEFAULT_AGGRESSION = 50;
+const DEFAULT_DENSITY = 10; // Midpoint → 50 each
+
+const MAX_SPRITES_PER_TYPE = 500;
+const MIN_SPRITES_PER_TYPE = 1;
+
 
 const preyOf = {
   rock: 'scissors',
@@ -27,46 +44,66 @@ const predatorOf = {
   scissors: 'rock'
 };
 
-const densitySlider = document.getElementById('densitySlider');
-const densityValue = document.getElementById('densityValue');
+// ===============================
+// Slider Setup & Event Handlers
+// ===============================
 
-const MAX_SPRITES_PER_TYPE = 500;
-const MIN_SPRITES_PER_TYPE = 1;
-
-densitySlider.addEventListener('input', () => {
-  const percentage = parseInt(densitySlider.value); // 0–100
-  const count = Math.floor(
-    MIN_SPRITES_PER_TYPE +
-    ((MAX_SPRITES_PER_TYPE - MIN_SPRITES_PER_TYPE) * (percentage / 100))
-  );
-
-  densityValue.textContent = `${count} each`;
-
-  resetSprites(count);
-});
-
+// --- Speed Slider ---
 const speedSlider = document.getElementById('speedSlider');
 const speedValue = document.getElementById('speedValue');
+
+speedSlider.value = DEFAULT_SPEED;
+speedValue.textContent = `${DEFAULT_SPEED.toFixed(1)}x`;
+speedMultiplier = DEFAULT_SPEED;
 
 speedSlider.addEventListener('input', () => {
   speedMultiplier = parseFloat(speedSlider.value);
   speedValue.textContent = `${speedMultiplier.toFixed(1)}x`;
 });
 
-let aggressionRatio = 0.6; // initial 60% attack
-
+// --- Aggression Slider ---
 const aggressionSlider = document.getElementById('aggressionSlider');
 const aggressionValue = document.getElementById('aggressionValue');
 
+aggressionSlider.value = DEFAULT_AGGRESSION;
+aggressionValue.textContent = `${DEFAULT_AGGRESSION}%`;
+aggressionRatio = 0.4 + (0.6 - 0.4) * (DEFAULT_AGGRESSION / 100);
+
 aggressionSlider.addEventListener('input', () => {
-  const sliderValue = parseInt(aggressionSlider.value); // 0–100
+  const sliderValue = parseInt(aggressionSlider.value);
   aggressionValue.textContent = `${sliderValue}%`;
 
-  // Map 0–100 slider value to aggression from 0 (defense) to 1 (attack)
-  // Then blend into a 0.0–1.0 range where 50% is 0.6 aggression
   const ratio = sliderValue / 100;
-  aggressionRatio = 0.4 + (0.6 - 0.4) * ratio; // 0.4–0.6 scaling
+  aggressionRatio = 0.4 + (0.6 - 0.4) * ratio;
 });
+
+// --- Density Slider ---
+const densitySlider = document.getElementById('densitySlider');
+const densityValue = document.getElementById('densityValue');
+
+densitySlider.value = DEFAULT_DENSITY;
+const startingCount = getSpriteCountFromSlider();
+densityValue.textContent = `${startingCount} each`;
+
+densitySlider.addEventListener('input', () => {
+  const count = getSpriteCountFromSlider();
+  densityValue.textContent = `${count} each`;
+  resetSprites(count);
+});
+
+// Shared helper
+function getSpriteCountFromSlider() {
+  const percentage = parseInt(densitySlider.value);
+  return Math.floor(
+    MIN_SPRITES_PER_TYPE +
+    ((MAX_SPRITES_PER_TYPE - MIN_SPRITES_PER_TYPE) * (percentage / 100))
+  );
+}
+
+
+// ===============================
+// Sprite Class & Sprite Management
+// ===============================
 
 class Sprite {
   constructor(type, x, y) {
@@ -77,9 +114,6 @@ class Sprite {
     this.speed = 2 + Math.random() * 2;
     this.dx = Math.random() * 2 - 1;
     this.dy = Math.random() * 2 - 1;
-    this.targetX = null;
-    this.targetY = null;
-    this.movingToTarget = false;
   }
 
   draw() {
@@ -118,31 +152,6 @@ class Sprite {
 
   convertTo(type) {
     this.type = type;
-  }
-
-  setTarget(x, y) {
-    this.targetX = x;
-    this.targetY = y;
-    this.movingToTarget = true;
-  }
-
-  moveToTarget() {
-    if (!this.movingToTarget || this.targetX === null || this.targetY === null) return;
-
-    const dx = this.targetX - this.x;
-    const dy = this.targetY - this.y;
-    const dist = Math.hypot(dx, dy);
-
-    if (dist < 1) {
-      this.x = this.targetX;
-      this.y = this.targetY;
-      this.movingToTarget = false;
-      return;
-    }
-
-    const speed = 2;
-    this.x += (dx / dist) * speed;
-    this.y += (dy / dist) * speed;
   }
 
   moveTowardPreyAndAvoidPredator(others) {
@@ -198,6 +207,13 @@ class Sprite {
 }
 
 const sprites = [];
+
+// ===============================
+// Sprite Utilities & Game State Helpers
+// ===============================
+
+
+// Reset all sprites and game state
 function resetSprites(count = 50) {
   sprites.length = 0;
   winner = null;
@@ -208,8 +224,8 @@ function resetSprites(count = 50) {
     sprites.push(new Sprite('scissors', Math.random() * canvas.width, Math.random() * canvas.height));
   }
 }
-resetSprites(50);
 
+// Count sprites by type and display on canvas
 function drawCounters() {
   const counts = { rock: 0, paper: 0, scissors: 0 };
   for (let sprite of sprites) {
@@ -218,24 +234,28 @@ function drawCounters() {
   ctx.fillStyle = 'black';
   ctx.font = '16px Arial';
   ctx.textAlign = 'left';
+
   ctx.fillText(`🪨 Rock: ${counts.rock}`, 10, 20);
   ctx.fillText(`📄 Paper: ${counts.paper}`, 10, 40);
   ctx.fillText(`✂️ Scissors: ${counts.scissors}`, 10, 60);
 }
 
-
+// Apply subtle drifting motion after victory
 function applyVictoryDrift(sprite) {
-  // Apply gentle drift once the game ends
   sprite.dx += (Math.random() - 0.5) * 0.05;
   sprite.dy += (Math.random() - 0.5) * 0.05;
-
-  // Smooth out speed
+ 
   const mag = Math.hypot(sprite.dx, sprite.dy);
   if (mag > 0.5) {
     sprite.dx *= 0.95;
     sprite.dy *= 0.95;
   }
 }
+resetSprites(50);
+
+// ===============================
+// Main Game Loop
+// ===============================
 
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -273,7 +293,7 @@ function loop() {
       }
   }
 
-  // Either animate victory or regular draw
+  // Animate victory
   for (let sprite of sprites) {
     if (winner) {
       applyVictoryDrift(sprite);
@@ -282,6 +302,7 @@ function loop() {
     sprite.draw();
   }
 
+  // HUD overlays
   drawCounters();
   fpsMonitor.draw();
 
@@ -294,6 +315,10 @@ function loop() {
   
   requestAnimationFrame(loop);
 }
+
+// ===============================
+// Reset Button Handler
+// ===============================
 
 document.getElementById('resetButton').addEventListener('click', () => {
   // Reset sliders to default values
