@@ -37,6 +37,15 @@ canvas {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap; /* allows stacking on small screens */
+}
+
+.slider-group span {
+  font-family: monospace;
+  display: inline-block;
+  width: 70px;        /* consistent space for values like "100 each" */
+  text-align: left;
+  flex-shrink: 0;     /* don’t shrink when wrapping */
 }
 
 label {
