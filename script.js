@@ -27,6 +27,24 @@ const predatorOf = {
   scissors: 'rock'
 };
 
+const densitySlider = document.getElementById('densitySlider');
+const densityValue = document.getElementById('densityValue');
+
+const MAX_SPRITES_PER_TYPE = 500;
+const MIN_SPRITES_PER_TYPE = 1;
+
+densitySlider.addEventListener('input', () => {
+  const percentage = parseInt(densitySlider.value); // 0–100
+  const count = Math.floor(
+    MIN_SPRITES_PER_TYPE +
+    ((MAX_SPRITES_PER_TYPE - MIN_SPRITES_PER_TYPE) * (percentage / 100))
+  );
+
+  densityValue.textContent = `${count} each`;
+
+  resetSprites(count);
+});
+
 const speedSlider = document.getElementById('speedSlider');
 const speedValue = document.getElementById('speedValue');
 
@@ -180,11 +198,17 @@ class Sprite {
 }
 
 const sprites = [];
-for (let i = 0; i < 20; i++) {
-  sprites.push(new Sprite('rock', Math.random() * canvas.width, Math.random() * canvas.height));
-  sprites.push(new Sprite('paper', Math.random() * canvas.width, Math.random() * canvas.height));
-  sprites.push(new Sprite('scissors', Math.random() * canvas.width, Math.random() * canvas.height));
+function resetSprites(count = 50) {
+  sprites.length = 0;
+  winner = null;
+
+  for (let i = 0; i < count; i++) {
+    sprites.push(new Sprite('rock', Math.random() * canvas.width, Math.random() * canvas.height));
+    sprites.push(new Sprite('paper', Math.random() * canvas.width, Math.random() * canvas.height));
+    sprites.push(new Sprite('scissors', Math.random() * canvas.width, Math.random() * canvas.height));
+  }
 }
+resetSprites(50);
 
 function drawCounters() {
   const counts = { rock: 0, paper: 0, scissors: 0 };
@@ -321,11 +345,7 @@ document.getElementById('resetButton').addEventListener('click', () => {
   sprites.length = 0;
   winner = null;
 
-  for (let i = 0; i < 20; i++) {
-    sprites.push(new Sprite('rock', Math.random() * canvas.width, Math.random() * canvas.height));
-    sprites.push(new Sprite('paper', Math.random() * canvas.width, Math.random() * canvas.height));
-    sprites.push(new Sprite('scissors', Math.random() * canvas.width, Math.random() * canvas.height));
-  }
+  resetSprites(50);
 });
 
 loop();
