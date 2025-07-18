@@ -35,6 +35,10 @@ const BASE_JITTER = 0.1;
 const BURST_CHANCE = 0.015;
 const BURST_STRENGTH = 1.5;
 
+const isSmallScreen = window.innerWidth < 450;
+const BASE_SPRITE_SIZE = isSmallScreen ? 20 : 28;
+const BASE_RADIUS = isSmallScreen ? 10 : 14;
+
 const preyOf = {
   rock: 'scissors',
   paper: 'rock',
@@ -113,14 +117,14 @@ class Sprite {
     this.type = type;
     this.x = x;
     this.y = y;
-    this.radius = 10;
+    this.radius = BASE_RADIUS;
     this.speed = 2 + Math.random() * 2;
     this.dx = Math.random() * 2 - 1;
     this.dy = Math.random() * 2 - 1;
   }
 
   draw() {
-    ctx.font = '20px Arial';
+    ctx.font = `${BASE_SPRITE_SIZE}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
