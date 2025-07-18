@@ -88,7 +88,7 @@ densityValue.textContent = `${startingCount} each`;
 densitySlider.addEventListener('input', () => {
   const count = getSpriteCountFromSlider();
   densityValue.textContent = `${count} each`;
-  resetSprites(count);
+  adjustSpriteCount(count);
 });
 
 // Shared helper
@@ -222,6 +222,29 @@ function resetSprites(count = 50) {
     sprites.push(new Sprite('rock', Math.random() * canvas.width, Math.random() * canvas.height));
     sprites.push(new Sprite('paper', Math.random() * canvas.width, Math.random() * canvas.height));
     sprites.push(new Sprite('scissors', Math.random() * canvas.width, Math.random() * canvas.height));
+  }
+}
+
+// Adjust sprite count based on density slider
+function adjustSpriteCount(perTypeCount) {
+  const desiredTotal = perTypeCount * 3;
+  const currentTotal = sprites.length;
+
+  if (currentTotal < desiredTotal) {
+    // Add new sprites, evenly by type
+    const toAdd = desiredTotal - currentTotal;
+    const types = ['rock', 'paper', 'scissors'];
+    for (let i = 0; i < toAdd; i++) {
+      const type = types[i % 3];
+      sprites.push(new Sprite(type, Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+  } else if (currentTotal > desiredTotal) {
+    // Remove random sprites
+    const toRemove = currentTotal - desiredTotal;
+    for (let i = 0; i < toRemove; i++) {
+      const index = Math.floor(Math.random() * sprites.length);
+      sprites.splice(index, 1);
+    }
   }
 }
 
