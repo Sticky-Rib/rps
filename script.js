@@ -1,6 +1,7 @@
 //1. Get Canvas
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+fpsMonitor.start(ctx);
 
 //2. Resize Canvas
 function resizeCanvas() {
@@ -250,6 +251,7 @@ function arrangeVictoryPattern(type) {
 
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  fpsMonitor.update();
 
   if (!winner) {
     for (let sprite of sprites) {
@@ -293,6 +295,7 @@ function loop() {
   }
 
   drawCounters();
+  fpsMonitor.draw();
 
   if (winner) {
     ctx.fillStyle = 'black';
@@ -300,7 +303,7 @@ function loop() {
     ctx.textAlign = 'center';
     ctx.fillText(`${winner.toUpperCase()} WINS! 🎉`, canvas.width / 2, 80);
   }
-
+  
   requestAnimationFrame(loop);
 }
 
