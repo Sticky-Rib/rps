@@ -128,10 +128,17 @@ function getColor(type) {
 }
 
 function downloadCSV() {
-  let csv = 'timestamp,rock,paper,scissors\n';
-  window.fullGameData.forEach(d => {
-    csv += `${d.timestamp},${d.rock},${d.paper},${d.scissors}\n`;
-  });
+  let csv = 'time (s),rock,paper,scissors\n';
+
+  if (window.fullGameData.length > 0) {
+    const start = window.fullGameData[0].timestamp;
+
+    window.fullGameData.forEach(d => {
+      const seconds = ((d.timestamp - start) / 1000).toFixed(2);
+      csv += `${seconds},${d.rock},${d.paper},${d.scissors}\n`;
+    });
+  }
+
   const blob = new Blob([csv], { type: 'text/csv' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
