@@ -42,6 +42,15 @@ const isSmallScreen = window.innerWidth < 450;
 const BASE_SPRITE_SIZE = isSmallScreen ? 20 : 28;
 const BASE_RADIUS = isSmallScreen ? 10 : 14;
 
+const spriteImages = {
+  rock: new Image(),
+  paper: new Image(),
+  scissors: new Image()
+};
+spriteImages.rock.src = 'assets/rock.png';
+spriteImages.paper.src = 'assets/paper.png';
+spriteImages.scissors.src = 'assets/scissors.png';
+
 const preyOf = {
   rock: 'scissors',
   paper: 'rock',
@@ -126,7 +135,18 @@ class Sprite {
     this.dy = Math.random() * 2 - 1;
   }
 
-  draw() {
+draw() {
+  const img = spriteImages[this.type];
+  if (img && img.complete) {
+    ctx.drawImage(
+      img,
+      this.x - this.radius,
+      this.y - this.radius,
+      this.radius * 2,
+      this.radius * 2
+    );
+  } else {
+    // fallback to emoji if image isn’t available
     ctx.font = `${BASE_SPRITE_SIZE}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -140,6 +160,7 @@ class Sprite {
 
     ctx.fillText(symbol, this.x, this.y);
   }
+}
 
   update() {
     if (Math.random() < BURST_CHANCE) {
