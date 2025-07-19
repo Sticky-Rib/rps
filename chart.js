@@ -1,0 +1,107 @@
+function renderChart(rawData, canvasId = 'finalGraph') {
+    const canvas = document.getElementById(canvasId);
+    const wrapper = document.getElementById(canvasId + 'Wrapper');
+
+    // ✅ Prepare to show and animate the wrapper (not canvas directly)
+    wrapper.style.display = 'block';
+    wrapper.style.opacity = '0';
+    wrapper.style.transition = 'opacity 0.3s ease';
+
+    // ✅ Let browser apply display before animating
+    requestAnimationFrame(() => {
+    wrapper.style.opacity = '1';
+    });
+
+  const recentData = filterLast30Seconds(rawData);
+  const smoothed = smoothData(recentData);
+
+  const start = rawData[0].timestamp;
+  const labels = smoothed.map(d => ((d.timestamp - start) / 1000).toFixed(1));
+
+  const datasets = ['rock', 'paper', 'scissors'].map(type => ({
+    label: type.charAt(0).toUpperCase() + type.slice(1),
+    data: smoothed.map(d => d[type]),
+    borderColor: getColor(type),
+    tension: 0.4,
+    fill: false,
+    pointRadius: 0
+  }));
+
+  // ✅ Delay to ensure canvas has rendered size
+  setTimeout(() => {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: { top: 10, bottom: 10, left: 10, right: 10 }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: { precision: 0 }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Final 30 Seconds - Sprite Counts Over Time',
+            color: '#000',
+            font: { size: 18 }
+          },
+            legend: {
+            labels: {
+                color: '#000',
+                font: { size: 16, weight: 'bold' }
+            },
+            position: 'top',
+            align: 'center'
+          }
+        }
+      }
+    });
+  }, 50); // Or increase to 100 if needed
+}
+function filterLast30Seconds(data) {
+  const now = data[data.length - 1].timestamp;
+  return data.filter(d => now - d.timestamp <= 30000);
+}
+
+function smoothData(data, windowSize = 5) {
+  const result = [];
+  for (let i = 0; i < data.length; i += windowSize) {
+    const slice = data.slice(i, i + windowSize);
+    const avg = { timestamp: slice[0].timestamp };
+    ['rock', 'paper', 'scissors'].forEach(type => {
+      avg[type] = Math.round(slice.reduce((sum, d) => sum + d[type], 0) / slice.length);
+    });
+    result.push(avg);
+  }
+  return result;
+}
+
+function getColor(type) {
+  return {
+    rock: 'red',
+    paper: 'blue',
+    scissors: 'green'
+  }[type];
+}
+
+function downloadCSV() {
+  let csv = 'timestamp,rock,paper,scissors\n';
+  window.fullGameData.forEach(d => {
+    csv += `${d.timestamp},${d.rock},${d.paper},${d.scissors}\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'simulation_data.csv';
+  link.click();
+}

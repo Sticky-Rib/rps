@@ -23,6 +23,9 @@ window.addEventListener('resize', resizeCanvas);
 let winner = null;
 let speedMultiplier = 1;
 let aggressionRatio = 0.6; // initial 60% attack
+let chartRendered = false;
+let fullGameData = [];
+window.fullGameData = fullGameData;
 
 const DEFAULT_SPEED = 1.0;
 const DEFAULT_AGGRESSION = 50;
@@ -320,10 +323,28 @@ function loop() {
       }
     }
 
+    // Collect data for charting
+    let rockCount = 0;
+    let paperCount = 0;
+    let scissorsCount = 0;
+    for (let sprite of sprites) {
+      if (sprite.type === 'rock') rockCount++;
+      else if (sprite.type === 'paper') paperCount++;
+      else if (sprite.type === 'scissors') scissorsCount++;
+    }
+    fullGameData.push({
+      timestamp: Date.now(),
+      rock: rockCount,
+      paper: paperCount,
+      scissors: scissorsCount
+    });
+
     // Check for win
     const remainingTypes = new Set(sprites.map(s => s.type));
-    if (remainingTypes.size === 1) {
+    if (remainingTypes.size === 1 && winner === null && !chartRendered) {
       winner = [...remainingTypes][0];
+      chartRendered = true;
+      renderChart(fullGameData, 'finalGraph');   // inline;
       }
   }
 
