@@ -5,23 +5,47 @@ function renderChart(rawData, canvasId = 'finalGraph') {
     const canvas = document.getElementById(canvasId);
     const wrapper = document.getElementById(canvasId + 'Wrapper');
 
-    // ✅ Prepare to show and animate the wrapper (not canvas directly)
+    // Prepare to show and animate the wrapper (not canvas directly)
     wrapper.style.opacity = '0';
     wrapper.style.display = 'block';
     wrapper.style.transition = 'opacity 0.3s ease';
 
-    // ✅ Let browser apply display before animating
+    // Create or reuse the download link
+    let existingLink = wrapper.querySelector('.csv-link');
+    if (!existingLink) {
+      const link = document.createElement('a');
+      link.textContent = 'Download CSV';
+      link.href = '#';
+      link.className = 'csv-link';
+      link.style.position = 'absolute';
+      link.style.top = '10px';
+      link.style.left = '12px';
+      link.style.textDecoration = 'underline';
+      link.style.color = '#0077cc';
+      link.style.fontSize = '14px';
+      link.style.zIndex = '10';
+      link.style.cursor = 'pointer';
+
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadCSV();
+      });
+
+    wrapper.appendChild(link);
+    }
+
+    // Let browser apply display before animating
     requestAnimationFrame(() => {
     wrapper.style.opacity = '1';
     });
 
-  const recentData = filterLast30Seconds(rawData);
-  const smoothed = smoothData(recentData);
+    const recentData = filterLast30Seconds(rawData);
+    const smoothed = smoothData(recentData);
 
-  const start = rawData[0].timestamp;
-  const labels = smoothed.map(d => ((d.timestamp - start) / 1000).toFixed(1));
+    const start = rawData[0].timestamp;
+    const labels = smoothed.map(d => ((d.timestamp - start) / 1000).toFixed(1));
 
-  const datasets = ['rock', 'paper', 'scissors'].map(type => ({
+    const datasets = ['rock', 'paper', 'scissors'].map(type => ({
     label: type.charAt(0).toUpperCase() + type.slice(1),
     data: smoothed.map(d => d[type]),
     borderColor: getColor(type),
@@ -30,7 +54,7 @@ function renderChart(rawData, canvasId = 'finalGraph') {
     pointRadius: 0
   }));
 
-  // ✅ Delay to ensure canvas has rendered size
+  // Delay to ensure canvas has rendered size
   setTimeout(() => {
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
