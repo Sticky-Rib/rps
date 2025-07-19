@@ -377,15 +377,30 @@ function loop() {
 // ===============================
 
 document.getElementById('resetButton').addEventListener('click', () => {
-  // Use current slider values (do not reset them)
+  // Get current values from sliders
   const speed = parseFloat(speedSlider.value);
   const aggression = parseInt(aggressionSlider.value);
   const count = getSpriteCountFromSlider();
 
+  // Reset gameplay state
   speedMultiplier = speed;
   aggressionRatio = 0.4 + (0.6 - 0.4) * (aggression / 100);
   winner = null;
+  chartRendered = false;
 
+  // Clear collected data
+  fullGameData.length = 0;
+
+  // Hide the chart wrapper with transition
+  const graphWrapper = document.getElementById('finalGraphWrapper');
+  if (graphWrapper) {
+    graphWrapper.style.opacity = '0';
+    setTimeout(() => {
+      graphWrapper.style.display = 'none';
+    }, 300); // match the CSS transition time
+  }
+
+  // Reset the sprites
   resetSprites(count);
 });
 
