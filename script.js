@@ -361,14 +361,6 @@ function loop() {
   drawCounters();
   fpsMonitor.draw();
 
-  if (winner) {
-    ctx.fillStyle = 'black';
-    ctx.font = '32px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${winner.toUpperCase()} WINS! 🎉`, canvas.width / 2, canvas.height / 2);
-  }
-  
   requestAnimationFrame(loop);
 }
 

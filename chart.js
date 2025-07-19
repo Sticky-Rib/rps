@@ -84,7 +84,7 @@ function renderChart(rawData, canvasId = 'finalGraph') {
         plugins: {
           title: {
             display: true,
-            text: 'Final 30 Seconds - Sprite Counts Over Time',
+            text: `${winner.toUpperCase()} Wins! Sprite Counts Over Time (30 seconds max)`,
             color: '#000',
             font: { size: 18 }
           },
