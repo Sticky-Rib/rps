@@ -1,10 +1,13 @@
+let currentChart = null;
+window.currentChart = currentChart;
+
 function renderChart(rawData, canvasId = 'finalGraph') {
     const canvas = document.getElementById(canvasId);
     const wrapper = document.getElementById(canvasId + 'Wrapper');
 
     // ✅ Prepare to show and animate the wrapper (not canvas directly)
-    wrapper.style.display = 'block';
     wrapper.style.opacity = '0';
+    wrapper.style.display = 'block';
     wrapper.style.transition = 'opacity 0.3s ease';
 
     // ✅ Let browser apply display before animating
@@ -33,7 +36,13 @@ function renderChart(rawData, canvasId = 'finalGraph') {
     canvas.height = canvas.clientHeight;
 
     const ctx = canvas.getContext('2d');
-    new Chart(ctx, {
+
+    // Clean up previous chart instance
+    if (currentChart) {
+      currentChart.destroy(); 
+    }
+    
+    currentChart = new Chart(ctx, {
       type: 'line',
       data: { labels, datasets },
       options: {
