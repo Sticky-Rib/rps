@@ -48,7 +48,12 @@ function mapSpeedToPlaybackRate(speed) {
 }
 
 export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsCount) {
-  if (!backgroundSource || !gainNodes.rock) return;
+    if (
+    !backgroundSource ||
+    !gainNodes.rock ||
+    !gainNodes.paper ||
+    !gainNodes.scissors
+  ) return;
 
   const total = rockCount + paperCount + scissorsCount;
   if (total === 0) return;
