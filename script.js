@@ -41,7 +41,7 @@ const MIN_SPRITES_PER_TYPE = 1;
 
 const BASE_JITTER = 0.1;
 const BURST_CHANCE = 0.015;
-const BURST_STRENGTH = 1.5;
+const BURST_STRENGTH = 1;
 
 const isSmallScreen = window.innerWidth < 450;
 const BASE_SPRITE_SIZE = isSmallScreen ? 20 : 28;
@@ -143,7 +143,7 @@ class Sprite {
     this.x = x;
     this.y = y;
     this.radius = BASE_RADIUS;
-    this.speed = (1 + Math.random()) * speedMultiplier;
+    this.speed = (1 + Math.random());
     this.dx = Math.random() * 2 - 1;
     this.dy = Math.random() * 2 - 1;
   }
@@ -324,6 +324,18 @@ function applyVictoryDrift(sprite) {
 }
 resetSprites(50);
 
+// Apply idle drift to sprites when no interaction
+function applyIdleDrift(sprite) {
+  sprite.dx += (Math.random() - 0.5) * 0.05;
+  sprite.dy += (Math.random() - 0.5) * 0.05;
+
+  const mag = Math.hypot(sprite.dx, sprite.dy);
+  if (mag > 0.5) {
+    sprite.dx *= 0.95;
+    sprite.dy *= 0.95;
+  }
+}
+
 // ===============================
 // Main Game Loop
 // ===============================
@@ -394,7 +406,12 @@ function loop() {
   for (let sprite of sprites) {
     if (winner) {
       applyVictoryDrift(sprite);
+    } else if (!interactionEnabled) {
+      applyIdleDrift(sprite);
+    } else {
+      sprite.moveTowardPreyAndAvoidPredator(sprites);
     }
+
     sprite.update();
     sprite.draw();
   }
