@@ -26,7 +26,7 @@ export const fpsMonitor = {
     if (!this.ctx) return;
     this.ctx.fillStyle = 'black';
     this.ctx.font = '14px monospace';
-    this.ctx.textAlign = 'right';
-    this.ctx.fillText(`${this.fps} fps`, this.ctx.canvas.width - 10, 20);
-  }
+    this.ctx.textAlign = 'left';
+    this.ctx.fillText(`${this.fps} fps`, 10, 80);
+}
 };
