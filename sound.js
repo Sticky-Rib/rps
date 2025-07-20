@@ -3,8 +3,13 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const ambientTracks = {};
 const gainNodes = {};
 let backgroundMuted = false;
+let soundInitialised = false;
 
 export async function initSound() {
+
+  if (soundInitialised) return;  // prevent double-load
+  soundInitialised = true;
+
   if (audioContext.state === 'suspended') {
     await audioContext.resume();
   }
@@ -22,6 +27,7 @@ export async function initSound() {
 }
 
 async function loadAndLoop(name, url, volume = 0) {
+  console.log(`🔁 loadAndLoop: ${name} → ${url}`);
   const res = await fetch(url);
   const buf = await res.arrayBuffer();
   const decoded = await audioContext.decodeAudioData(buf);
