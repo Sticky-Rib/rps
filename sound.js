@@ -2,15 +2,15 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const ambientTracks = {};
 const gainNodes = {};
-let nervousSource = null;
+let backgroundSource = null;
 
 export async function initSound() {
   if (audioContext.state === 'suspended') {
     await audioContext.resume();
   }
 
-  // Load nervous background loop
-  nervousSource = await loadAndLoop('nervous', 'assets/nervous_loop.wav', 0.4);
+  // Load background loop
+  backgroundSource = await loadAndLoop('background', 'assets/background_loop.wav', 0.4);
 
   // Load dominance loops at 0 volume
   await loadAndLoop('rock', 'assets/rock_loop.wav');
@@ -48,7 +48,7 @@ function mapSpeedToPlaybackRate(speed) {
 }
 
 export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsCount) {
-  if (!nervousSource || !gainNodes.rock) return;
+  if (!backgroundSource || !gainNodes.rock) return;
 
   const total = rockCount + paperCount + scissorsCount;
   if (total === 0) return;
@@ -69,5 +69,5 @@ export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsC
 
   // Adjust nervous playback rate subtly
   const targetRate = mapSpeedToPlaybackRate(speedMultiplier);
-  nervousSource.playbackRate.value += (targetRate - nervousSource.playbackRate.value) * 0.05;
+  backgroundSource.playbackRate.value += (targetRate - backgroundSource.playbackRate.value) * 0.05;
 }
