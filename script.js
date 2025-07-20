@@ -378,6 +378,7 @@ function loop() {
     const remainingTypes = new Set(sprites.map(s => s.type));
     if (remainingTypes.size === 1 && winner === null && !chartRendered) {
       winner = [...remainingTypes][0];
+      window.winner = winner;
       chartRendered = true;
       renderChart(fullGameData, 'finalGraph');   // inline;
       }
