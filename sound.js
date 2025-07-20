@@ -125,3 +125,32 @@ export async function cycleBackgroundTrack() {
   return icon;
 }
 
+export async function playVictorySound() {
+  try {
+    const res = await fetch('assets/victory.wav');
+    const buf = await res.arrayBuffer();
+    const decoded = await audioContext.decodeAudioData(buf);
+
+    const source = audioContext.createBufferSource();
+    source.buffer = decoded;
+
+    const gain = audioContext.createGain();
+    gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+
+    source.connect(gain);
+    gain.connect(audioContext.destination);
+
+    source.start(audioContext.currentTime);
+  } catch (err) {
+    console.warn('⚠️ Could not play victory sound:', err);
+  }
+}
+
+export function silenceSpriteLoops() {
+  ['rock', 'paper', 'scissors'].forEach(type => {
+    if (gainNodes[type]) {
+      gainNodes[type].gain.setValueAtTime(0, audioContext.currentTime);
+    }
+  });
+}
+

@@ -1,4 +1,4 @@
-import { initSound, updateSoundMix, cycleBackgroundTrack} from './sound.js';
+import { initSound, updateSoundMix, cycleBackgroundTrack, playVictorySound, silenceSpriteLoops} from './sound.js';
 import { fpsMonitor } from './fps-monitor.js';
 
 // ===============================
@@ -398,6 +398,8 @@ function loop() {
       winner = [...remainingTypes][0];
       window.winner = winner;
       chartRendered = true;
+      playVictorySound();
+      silenceSpriteLoops();
       renderChart(fullGameData, 'finalGraph');   // inline;
       }
   }
