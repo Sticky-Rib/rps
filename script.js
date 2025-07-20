@@ -28,6 +28,8 @@ let speedMultiplier = 1;
 let aggressionRatio = 0.6; // initial 60% attack
 let chartRendered = false;
 let fullGameData = [];
+let simulationStarted = false;
+let interactionEnabled = false;
 window.fullGameData = fullGameData;
 
 const DEFAULT_SPEED = 1.0;
@@ -141,7 +143,7 @@ class Sprite {
     this.x = x;
     this.y = y;
     this.radius = BASE_RADIUS;
-    this.speed = 2 + Math.random() * 2;
+    this.speed = (1 + Math.random()) * speedMultiplier;
     this.dx = Math.random() * 2 - 1;
     this.dy = Math.random() * 2 - 1;
   }
@@ -332,24 +334,28 @@ function loop() {
 
   if (!winner) {
     for (let sprite of sprites) {
-      sprite.moveTowardPreyAndAvoidPredator(sprites);
+      if (interactionEnabled) {
+        sprite.moveTowardPreyAndAvoidPredator(sprites);
+      }
       sprite.update();
     }
 
     // Handle collisions and conversions
-    for (let i = 0; i < sprites.length; i++) {
-      for (let j = i + 1; j < sprites.length; j++) {
-        const a = sprites[i];
-        const b = sprites[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const dist = Math.hypot(dx, dy);
+    if (interactionEnabled) {
+      for (let i = 0; i < sprites.length; i++) {
+        for (let j = i + 1; j < sprites.length; j++) {
+          const a = sprites[i];
+          const b = sprites[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const dist = Math.hypot(dx, dy);
 
-        if (dist < a.radius + b.radius) {
-          if (a.isPreyOf(b)) {
-            a.convertTo(b.type);
-          } else if (b.isPreyOf(a)) {
-            b.convertTo(a.type);
+          if (dist < a.radius + b.radius) {
+            if (a.isPreyOf(b)) {
+              a.convertTo(b.type);
+            } else if (b.isPreyOf(a)) {
+              b.convertTo(a.type);
+            }
           }
         }
       }
@@ -443,4 +449,17 @@ document.getElementById('resetButton').addEventListener('click', () => {
   resetSprites(count);
 });
 
-loop();
+resetSprites(getSpriteCountFromSlider()); // spawn idle sprites
+loop(); // begin passive animation
+
+function startSimulation() {
+  interactionEnabled = true;
+}
+
+document.getElementById('startButton').addEventListener('click', async () => {
+  await initSound(); // load and begin all audio
+  document.getElementById('startOverlay').style.display = 'none';
+  document.getElementById('controls').style.display = 'flex';
+  interactionEnabled = true;
+  startSimulation();
+});

@@ -10,7 +10,10 @@ export async function initSound() {
   }
 
   // Load background loop
-  backgroundSource = await loadAndLoop('background', 'assets/background_loop.wav', 0.4);
+  backgroundSource = await loadAndLoop('background', 'assets/background_loop.wav', 0);
+  const now = audioContext.currentTime;
+  gainNodes['background'].gain.setValueAtTime(0, now);
+  gainNodes['background'].gain.linearRampToValueAtTime(0.25, now + 2);
 
   // Load dominance loops at 0 volume
   await loadAndLoop('rock', 'assets/rock_loop.wav');
@@ -66,11 +69,15 @@ export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsC
 
   const maxType = Object.entries(ratios).sort((a, b) => b[1] - a[1])[0][0];
 
-  ['rock', 'paper', 'scissors'].forEach(type => {
-    const target = type === maxType ? 0.5 : 0;
+    ['rock', 'paper', 'scissors'].forEach(type => {
+    const ratio = ratios[type]; // e.g. 0.33 for equal, 0.7 if dominant
+    const target = Math.max(0, (ratio - 0.5) * 2); // fades in only above 50% dominance
+    const maxVolume = 0.5;
+    const desiredVolume = Math.min(target * maxVolume, maxVolume);
+
     const current = gainNodes[type].gain.value;
-    gainNodes[type].gain.value += (target - current) * 0.05;
-  });
+    gainNodes[type].gain.value += (desiredVolume - current) * 0.05;
+    });
 
   // Adjust nervous playback rate subtly
   const targetRate = mapSpeedToPlaybackRate(speedMultiplier);
