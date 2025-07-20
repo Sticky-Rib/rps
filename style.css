@@ -100,3 +100,17 @@ button {
   cursor: pointer;
   font-family: inherit;
 }
+
+#muteToggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 20px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 2px solid black;
+  background: white;
+  cursor: pointer;
+  z-index: 3000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}

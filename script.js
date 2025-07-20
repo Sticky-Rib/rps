@@ -1,4 +1,4 @@
-import { initSound, updateSoundMix } from './sound.js';
+import { initSound, updateSoundMix, setBackgroundMuted } from './sound.js';
 import { fpsMonitor } from './fps-monitor.js';
 
 // ===============================
@@ -479,4 +479,12 @@ document.getElementById('startButton').addEventListener('click', async () => {
   document.getElementById('controls').style.display = 'flex';
   interactionEnabled = true;
   startSimulation();
+});
+
+let isBackgroundMuted = false;
+
+document.getElementById('muteToggle').addEventListener('click', () => {
+  isBackgroundMuted = !isBackgroundMuted;
+  setBackgroundMuted(isBackgroundMuted);
+  document.getElementById('muteToggle').textContent = isBackgroundMuted ? '🔇' : '🔊';
 });

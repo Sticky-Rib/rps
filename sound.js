@@ -2,23 +2,23 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const ambientTracks = {};
 const gainNodes = {};
-let backgroundSource = null;
+let backgroundMuted = false;
 
 export async function initSound() {
   if (audioContext.state === 'suspended') {
     await audioContext.resume();
   }
 
-  // Load background loop
-  backgroundSource = await loadAndLoop('background', 'assets/background_loop.wav', 0);
-  const now = audioContext.currentTime;
-  gainNodes['background'].gain.setValueAtTime(0, now);
-  gainNodes['background'].gain.linearRampToValueAtTime(0.25, now + 2);
+  if (!ambientTracks['background']) {
+    await loadAndLoop('background', 'assets/background_loop.wav', 0);
+    const now = audioContext.currentTime;
+    gainNodes['background'].gain.setValueAtTime(0, now);
+    gainNodes['background'].gain.linearRampToValueAtTime(0.25, now + 2);
+  }
 
-  // Load dominance loops at 0 volume
-  await loadAndLoop('rock', 'assets/rock_loop.wav');
-  await loadAndLoop('paper', 'assets/paper_loop.wav');
-  await loadAndLoop('scissors', 'assets/scissors_loop.wav');
+  if (!gainNodes['rock']) await loadAndLoop('rock', 'assets/rock_loop.wav');
+  if (!gainNodes['paper']) await loadAndLoop('paper', 'assets/paper_loop.wav');
+  if (!gainNodes['scissors']) await loadAndLoop('scissors', 'assets/scissors_loop.wav');
 }
 
 async function loadAndLoop(name, url, volume = 0) {
@@ -46,13 +46,13 @@ function mapSpeedToPlaybackRate(speed) {
   const minSpeed = 0.2;
   const maxSpeed = 3.0;
   const t = (speed - minSpeed) / (maxSpeed - minSpeed);
-  const eased = 0.5 + 0.25 * Math.sin((t - 0.5) * Math.PI);  // ease-in-out
+  const eased = 0.5 + 0.25 * Math.sin((t - 0.5) * Math.PI);
   return 0.95 + eased * 0.2;
 }
 
 export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsCount) {
-    if (
-    !backgroundSource ||
+  if (
+    !ambientTracks['background'] ||
     !gainNodes.rock ||
     !gainNodes.paper ||
     !gainNodes.scissors
@@ -67,19 +67,53 @@ export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsC
     scissors: scissorsCount / total
   };
 
-  const maxType = Object.entries(ratios).sort((a, b) => b[1] - a[1])[0][0];
-
-    ['rock', 'paper', 'scissors'].forEach(type => {
-    const ratio = ratios[type]; // e.g. 0.33 for equal, 0.7 if dominant
-    const target = Math.max(0, (ratio - 0.5) * 2); // fades in only above 50% dominance
+  ['rock', 'paper', 'scissors'].forEach(type => {
+    const ratio = ratios[type];
+    const target = Math.max(0, (ratio - 0.5) * 2);
     const maxVolume = 0.5;
     const desiredVolume = Math.min(target * maxVolume, maxVolume);
 
     const current = gainNodes[type].gain.value;
     gainNodes[type].gain.value += (desiredVolume - current) * 0.05;
-    });
+  });
 
-  // Adjust nervous playback rate subtly
-  const targetRate = mapSpeedToPlaybackRate(speedMultiplier);
-  backgroundSource.playbackRate.value += (targetRate - backgroundSource.playbackRate.value) * 0.05;
+  // Adjust playback rate of background only if unmuted
+  const source = ambientTracks['background'];
+  if (!backgroundMuted && source && gainNodes['background']?.gain.value > 0.001) {
+    const targetRate = mapSpeedToPlaybackRate(speedMultiplier);
+    source.playbackRate.value += (targetRate - source.playbackRate.value) * 0.05;
+  }
+}
+
+export async function setBackgroundMuted(muted) {
+  backgroundMuted = muted;
+  console.log('Background mute set to:', muted);
+
+  // Stop and disconnect existing background source
+  if (ambientTracks['background']) {
+    try {
+      ambientTracks['background'].stop();
+      ambientTracks['background'].disconnect();
+    } catch (err) {
+      console.warn('Failed to stop background source:', err);
+    }
+    delete ambientTracks['background'];
+  }
+
+  if (gainNodes['background']) {
+    try {
+      gainNodes['background'].disconnect();
+    } catch (err) {
+      console.warn('Failed to disconnect gain node:', err);
+    }
+    delete gainNodes['background'];
+  }
+
+  // Choose new file
+  const file = muted
+    ? 'assets/silent_loop.wav'
+    : 'assets/background_loop.wav';
+
+  // Load new loop
+  await loadAndLoop('background', file, muted ? 0 : 0.25);
 }
