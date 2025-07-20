@@ -5,6 +5,14 @@ const gainNodes = {};
 let backgroundMuted = false;
 let soundInitialised = false;
 
+const backgroundTracks = [
+  { file: 'assets/background_loop.wav', icon: '🔈1' },
+  { file: 'assets/background_loop_alt1.wav', icon: '🔈2' },
+  { file: 'assets/silent_loop.wav', icon: '🔇' }
+];
+
+let currentBackgroundIndex = 0;
+
 export async function initSound() {
 
   if (soundInitialised) return;  // prevent double-load
@@ -91,35 +99,29 @@ export function updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsC
   }
 }
 
-export async function setBackgroundMuted(muted) {
-  backgroundMuted = muted;
-  console.log('Background mute set to:', muted);
+export async function cycleBackgroundTrack() {
+  currentBackgroundIndex = (currentBackgroundIndex + 1) % backgroundTracks.length;
+  const { file, icon } = backgroundTracks[currentBackgroundIndex];
 
-  // Stop and disconnect existing background source
+  // Stop and disconnect existing background track
   if (ambientTracks['background']) {
     try {
       ambientTracks['background'].stop();
       ambientTracks['background'].disconnect();
-    } catch (err) {
-      console.warn('Failed to stop background source:', err);
-    }
+    } catch (e) {}
     delete ambientTracks['background'];
   }
 
   if (gainNodes['background']) {
     try {
       gainNodes['background'].disconnect();
-    } catch (err) {
-      console.warn('Failed to disconnect gain node:', err);
-    }
+    } catch (e) {}
     delete gainNodes['background'];
   }
 
-  // Choose new file
-  const file = muted
-    ? 'assets/silent_loop.wav'
-    : 'assets/background_loop.wav';
+  console.log('🎵 Switching background to:', file);
+  await loadAndLoop('background', file, file.includes('silent') ? 0 : 0.25);
 
-  // Load new loop
-  await loadAndLoop('background', file, muted ? 0 : 0.25);
+  return icon;
 }
+

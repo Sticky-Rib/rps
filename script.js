@@ -1,4 +1,4 @@
-import { initSound, updateSoundMix, setBackgroundMuted } from './sound.js';
+import { initSound, updateSoundMix, cycleBackgroundTrack} from './sound.js';
 import { fpsMonitor } from './fps-monitor.js';
 
 // ===============================
@@ -481,10 +481,9 @@ document.getElementById('startButton').addEventListener('click', async () => {
   startSimulation();
 });
 
-let isBackgroundMuted = false;
-
-document.getElementById('muteToggle').addEventListener('click', () => {
-  isBackgroundMuted = !isBackgroundMuted;
-  setBackgroundMuted(isBackgroundMuted);
-  document.getElementById('muteToggle').textContent = isBackgroundMuted ? '🔇' : '🔊';
+document.getElementById('cycleMusicButton').addEventListener('click', async () => {
+  const icon = await cycleBackgroundTrack();
+  document.getElementById('cycleMusicButton').textContent = icon;
 });
+
+document.getElementById('cycleMusicButton').textContent = '🔈1';
