@@ -1,3 +1,6 @@
+import { initSound, updateSoundMix } from './sound.js';
+import { fpsMonitor } from './fps-monitor.js';
+
 // ===============================
 // Canvas Setup
 // ===============================
@@ -62,6 +65,14 @@ const predatorOf = {
   paper: 'scissors',
   scissors: 'rock'
 };
+
+// ===============================
+// Audio Setup
+// ===============================
+
+document.body.addEventListener('click', () => {
+  initSound();
+}, { once: true });
 
 // ===============================
 // Slider Setup & Event Handlers
@@ -359,6 +370,9 @@ function loop() {
       paper: paperCount,
       scissors: scissorsCount
     });
+
+    // Update sound mix based on counts
+    updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsCount);
 
     // Check for win
     const remainingTypes = new Set(sprites.map(s => s.type));
