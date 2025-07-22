@@ -135,7 +135,7 @@ export async function playVictorySound() {
     source.buffer = decoded;
 
     const gain = audioContext.createGain();
-    gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+    gain.gain.setValueAtTime(0.05, audioContext.currentTime);
 
     source.connect(gain);
     gain.connect(audioContext.destination);
