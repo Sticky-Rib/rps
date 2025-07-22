@@ -498,14 +498,6 @@ function startSimulation() {
   interactionEnabled = true;
 }
 
-document.getElementById('startButton').addEventListener('click', async () => {
-  await initSound(); // load and begin all audio
-  document.getElementById('startOverlay').style.display = 'none';
-  document.getElementById('controls').style.display = 'flex';
-  interactionEnabled = true;
-  startSimulation();
-});
-
 document.getElementById('cycleMusicButton').addEventListener('click', async () => {
   const icon = await cycleBackgroundTrack();
   document.getElementById('cycleMusicButton').textContent = icon;
