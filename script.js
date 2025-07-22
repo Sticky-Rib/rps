@@ -28,13 +28,13 @@ let speedMultiplier = 1;
 let aggressionRatio = 0.6; // initial 60% attack
 let chartRendered = false;
 let fullGameData = [];
-let simulationStarted = false;
+//let simulationStarted = false;
 let interactionEnabled = false;
 window.fullGameData = fullGameData;
 
 const DEFAULT_SPEED = 1.0;
 const DEFAULT_AGGRESSION = 60;
-const DEFAULT_DENSITY = 33; // Midpoint → 50 each
+const DEFAULT_DENSITY = 33; // Percentage of max sprites per type
 
 const MAX_SPRITES_PER_TYPE = 150;
 const MIN_SPRITES_PER_TYPE = 1;
@@ -302,13 +302,29 @@ function drawCounters() {
   for (let sprite of sprites) {
     counts[sprite.type]++;
   }
-  ctx.fillStyle = 'black';
-  ctx.font = '16px Arial';
-  ctx.textAlign = 'left';
 
-  ctx.fillText(`🪨 Rock: ${counts.rock}`, 10, 20);
-  ctx.fillText(`📄 Paper: ${counts.paper}`, 10, 40);
-  ctx.fillText(`✂️ Scissors: ${counts.scissors}`, 10, 60);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = '16px Arial';
+  ctx.fillStyle = 'black';
+
+  const spacing = 22;
+  const iconSize = 24; // you can tweak this
+  const marginLeft = 10;
+  const textOffset = iconSize + 8;
+
+  const types = ['rock', 'paper', 'scissors'];
+
+  types.forEach((type, index) => {
+    const y = spacing * (index + 1);
+    const img = spriteImages[type];
+
+    if (img && img.complete) {
+      ctx.drawImage(img, marginLeft, y - iconSize / 2, iconSize, iconSize);
+    }
+
+    ctx.fillText(`${type[0].toUpperCase() + type.slice(1)}: ${counts[type]}`, marginLeft + textOffset, y);
+  });
 }
 
 // Apply subtle drifting motion after victory
