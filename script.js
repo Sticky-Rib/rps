@@ -33,10 +33,10 @@ let interactionEnabled = false;
 window.fullGameData = fullGameData;
 
 const DEFAULT_SPEED = 1.0;
-const DEFAULT_AGGRESSION = 50;
-const DEFAULT_DENSITY = 10; // Midpoint → 50 each
+const DEFAULT_AGGRESSION = 60;
+const DEFAULT_DENSITY = 33; // Midpoint → 50 each
 
-const MAX_SPRITES_PER_TYPE = 500;
+const MAX_SPRITES_PER_TYPE = 150;
 const MIN_SPRITES_PER_TYPE = 1;
 
 const BASE_JITTER = 0.1;
@@ -44,8 +44,8 @@ const BURST_CHANCE = 0.015;
 const BURST_STRENGTH = 1;
 
 const isSmallScreen = window.innerWidth < 450;
-const BASE_SPRITE_SIZE = isSmallScreen ? 20 : 28;
-const BASE_RADIUS = isSmallScreen ? 10 : 14;
+const BASE_SPRITE_SIZE = isSmallScreen ? 20 : 34;
+const BASE_RADIUS = isSmallScreen ? 10 : 16;
 
 const spriteImages = {
   rock: new Image(),
