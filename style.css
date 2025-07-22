@@ -1,5 +1,6 @@
 /* Reset margins and prevent scroll */
 html, body {
+  font-family: Verdana, Tahoma, sans-serif;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -24,7 +25,7 @@ canvas {
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 12px;
 
@@ -40,26 +41,29 @@ canvas {
 
   transition: transform 0.2s ease;
   transform-origin: top center;
+
+  font-family: inherit;
 }
 
 .slider-group {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   gap: 10px;
-  flex-wrap: wrap; /* allows stacking on small screens */
+  align-items: center;
+  font-family: inherit;
 }
 
 .slider-group span {
-  font-family: monospace;
   display: inline-block;
-  width: 70px;        /* consistent space for values like "100 each" */
+  width: 80px;        /* consistent space for values like "100 each" */
   text-align: left;
   flex-shrink: 0;     /* don’t shrink when wrapping */
   white-space: nowrap; /* prevents wrapping of '100 each' */
 }
 
 label {
-  font-weight: bold;
+  font-weight: normal;
+  font-family: inherit;
 }
 
 button {
@@ -67,37 +71,6 @@ button {
   font-size: 16px;
   cursor: pointer;
   border-radius: 6px;
-}
-
-#startOverlay {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  background: rgba(255, 255, 255, 0.7);
-  padding: 16px 24px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-
-  width: 100%;
-  max-width: 360px;
-  min-width: 280px;
-  box-sizing: border-box;
-
-  z-index: 2000;
-}
-
-#startButton {
-  padding: 43px 32px;
-  font-size: 45px;
-  border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.7);
-  border: none;
-  cursor: pointer;
   font-family: inherit;
 }
 
@@ -106,6 +79,7 @@ button {
   top: 16px;
   right: 56px;
   font-size: 20px;
+  font-family: inherit;
   padding: 0;
   border: none;
   background: none;

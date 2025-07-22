@@ -27,10 +27,12 @@ let winner = null;
 let speedMultiplier = 1;
 let aggressionRatio = 0.6; // initial 60% attack
 let chartRendered = false;
+let isFirstRun = true;
 let fullGameData = [];
-//let simulationStarted = false;
 let interactionEnabled = false;
 window.fullGameData = fullGameData;
+
+const GAME_FONT_FAMILY = 'Verdana, Tahoma, sans-serif';
 
 const DEFAULT_SPEED = 1.0;
 const DEFAULT_AGGRESSION = 60;
@@ -160,7 +162,7 @@ draw() {
     );
   } else {
     // fallback to emoji if image isn’t available
-    ctx.font = `${BASE_SPRITE_SIZE}px Arial`;
+    ctx.font = `${BASE_SPRITE_SIZE}px ${GAME_FONT_FAMILY}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -305,7 +307,7 @@ function drawCounters() {
 
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.font = '16px Arial';
+  ctx.font = `16px ${GAME_FONT_FAMILY}`;
   ctx.fillStyle = 'black';
 
   const spacing = 22;
@@ -446,41 +448,46 @@ function loop() {
 // ===============================
 
 document.getElementById('resetButton').addEventListener('click', () => {
-  // 1. Get current slider values
+  if (isFirstRun) {
+    document.getElementById('controls').style.display = 'flex'; // show sliders
+    document.getElementById('resetButton').textContent = '🔁 Restart';
+    document.getElementById('resetButton').title = 'Restart the simulation';
+    isFirstRun = false;
+    interactionEnabled = true;
+    startSimulation(); // enables interaction
+    initSound(); // optional – only if you want sound on first button press
+  }
+
+  // Reset logic happens every time (including first)
   const speed = parseFloat(speedSlider.value);
   const aggression = parseInt(aggressionSlider.value);
   const count = getSpriteCountFromSlider();
 
-  // 2. Reset game logic flags
   speedMultiplier = speed;
   aggressionRatio = 0.4 + (0.6 - 0.4) * (aggression / 100);
   winner = null;
   chartRendered = false;
 
-  // 3. Clear chart data
   if (window.currentChart) {
     window.currentChart.destroy();
     window.currentChart = null;
   }
+
   fullGameData.length = 0;
 
-  // 4. Fully hide and reset chart display
   const graphWrapper = document.getElementById('finalGraphWrapper');
   const graphCanvas = document.getElementById('finalGraph');
   if (graphWrapper && graphCanvas) {
     graphWrapper.style.opacity = '0';
     setTimeout(() => {
       graphWrapper.style.display = 'none';
-
-      // Reset canvas size and clear it
       graphCanvas.width = graphCanvas.clientWidth;
       graphCanvas.height = graphCanvas.clientHeight;
       const ctx = graphCanvas.getContext('2d');
       ctx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
-    }, 300); // Match CSS transition time
+    }, 300);
   }
 
-  // 5. Start fresh game
   resetSprites(count);
 });
 

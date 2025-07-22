@@ -10,27 +10,27 @@
 
   <canvas id="gameCanvas"></canvas>
 
-  <div id="controls">
-    <div class="slider-group">
-      <label for="speedSlider">Speed:</label>
-      <input type="range" id="speedSlider" min="0.2" max="3" step="0.1" value="1">
-      <span id="speedValue">1.0x</span>
-    </div>
-
-    <div class="slider-group">
-      <label for="aggressionSlider">Aggression:</label>
-      <input type="range" id="aggressionSlider" min="0" max="100" value="50">
-      <span id="aggressionValue">50%</span>
-    </div>
-
-    <div class="slider-group">
-      <label for="densitySlider">Density:</label>
-      <input type="range" id="densitySlider" min="0" max="100" value="10">
-      <span id="densityValue">50 each</span>
-    </div>
-
-    <button id="resetButton" title="Restart the simulation">🔁 Restart</button>
+<div id="controls">
+  <div class="slider-group">
+    <label for="speedSlider">Speed:</label>
+    <input type="range" id="speedSlider" min="0.1" max="3" step="0.1">
+    <span id="speedValue">1.0x</span>
   </div>
+
+  <div class="slider-group">
+    <label for="aggressionSlider">Aggression:</label>
+    <input type="range" id="aggressionSlider">
+    <span id="aggressionValue">60%</span>
+  </div>
+
+  <div class="slider-group">
+    <label for="densitySlider">Density:</label>
+    <input type="range" id="densitySlider">
+    <span id="densityValue">50 each</span>
+  </div>
+
+  <button id="resetButton" title="Start the simulation">▶️ Start</button>
+</div>
 
 <div id="finalGraphWrapper" style="
   width: 85vw;
@@ -58,10 +58,6 @@
   <script type="module" src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="chart.js"></script>
-
-<div id="startOverlay">
-  <button id="startButton">Start</button>
-</div>
 
 <button id="cycleMusicButton">🔈1</button>
 
