@@ -18,18 +18,15 @@ import { fpsMonitor } from './fps-monitor.js';
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Start FPS monitor
-fpsMonitor.start(ctx);
-
-// ===============================
-// Responsive Canvas Size
-// ===============================
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+
+// Start FPS monitor, used for performance tracking and balancing
+fpsMonitor.start(ctx);
 
 // ===============================
 // Global State and Constants
@@ -343,10 +340,13 @@ function applyIdleDrift(sprite) {
   sprite.dx += (Math.random() - 0.5) * 0.05;
   sprite.dy += (Math.random() - 0.5) * 0.05;
 
+    // Clamp overall speed to prevent runaway drift
   const mag = Math.hypot(sprite.dx, sprite.dy);
-  if (mag > 0.5) {
-    sprite.dx *= 0.95;
-    sprite.dy *= 0.95;
+  const maxIdleSpeed = 1; // or tweak as needed
+
+  if (mag > maxIdleSpeed) {
+    sprite.dx = (sprite.dx / mag) * maxIdleSpeed;
+    sprite.dy = (sprite.dy / mag) * maxIdleSpeed;
   }
 }
 
@@ -358,83 +358,79 @@ function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   fpsMonitor.update();
 
-  if (!winner) { // If no winner, Game on!
-    for (let sprite of sprites) {
-      if (interactionEnabled) {
-        sprite.moveTowardPreyAndAvoidPredator(sprites);
-      }
-      sprite.update();
-    }
-
-    // Handle collisions and conversions
-    if (interactionEnabled) {
-      for (let i = 0; i < sprites.length; i++) {
-        for (let j = i + 1; j < sprites.length; j++) {
-          const a = sprites[i];
-          const b = sprites[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.hypot(dx, dy);
-
-          if (dist < a.radius + b.radius) {
-            if (a.isPreyOf(b)) {
-              a.convertTo(b.type);
-            } else if (b.isPreyOf(a)) {
-              b.convertTo(a.type);
-            }
-          }
-        }
-      }
-    }
-
-    // Collect data for charting
-    let rockCount = 0;
-    let paperCount = 0;
-    let scissorsCount = 0;
-    for (let sprite of sprites) {
-      if (sprite.type === 'rock') rockCount++;
-      else if (sprite.type === 'paper') paperCount++;
-      else if (sprite.type === 'scissors') scissorsCount++;
-    }
-    fullGameData.push({
-      timestamp: Date.now(),
-      rock: rockCount,
-      paper: paperCount,
-      scissors: scissorsCount
-      // Add Speed
-      // Add Aggression
-    });
-
-    // Update sound mix based on counts
-    updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsCount);
-
-    // Check for win
-    const remainingTypes = new Set(sprites.map(s => s.type));
-    if (remainingTypes.size === 1 && winner === null && !chartRendered) {
-      winner = [...remainingTypes][0];
-      window.winner = winner;
-      chartRendered = true;
-      playVictorySound();
-      silenceSpriteLoops();
-      renderChart(fullGameData, 'finalGraph');   // inline;
-      }
-  }
-
-  // Animate victory when there is a winner
+  // Sprite logic (movement, drift, drawing)
   for (let sprite of sprites) {
-    if (winner) {
-      applyIdleDrift(sprite);
+    if (winner || !interactionEnabled) {
+      applyIdleDrift(sprite);      
+    } else {
+      sprite.moveTowardPreyAndAvoidPredator(sprites);
     }
+
     sprite.update();
     sprite.draw();
   }
 
-  // HUD overlays
+  // Handle collisions and conversions
+  if (interactionEnabled) {
+    for (let i = 0; i < sprites.length; i++) {
+      for (let j = i + 1; j < sprites.length; j++) {
+        const a = sprites[i];
+        const b = sprites[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < a.radius + b.radius) {
+          if (a.isPreyOf(b)) {
+            a.convertTo(b.type);
+          } else if (b.isPreyOf(a)) {
+            b.convertTo(a.type);
+          }
+        }
+      }
+    }
+  }
+
+  // Collect data for charting
+  let rockCount = 0;
+  let paperCount = 0;
+  let scissorsCount = 0;
+  for (let sprite of sprites) {
+    if (sprite.type === 'rock') rockCount++;
+    else if (sprite.type === 'paper') paperCount++;
+    else if (sprite.type === 'scissors') scissorsCount++;
+  }
+  fullGameData.push({
+    timestamp: Date.now(),
+    rock: rockCount,
+    paper: paperCount,
+    scissors: scissorsCount
+    // Add Speed
+    // Add Aggression
+  });
+
+  // Update sound mix based on counts
+  if (!winner && interactionEnabled) {
+    updateSoundMix(speedMultiplier, rockCount, paperCount, scissorsCount);
+  }
+
+  // Check for win
+  const remainingTypes = new Set(sprites.map(s => s.type));
+  if (remainingTypes.size === 1 && winner === null && !chartRendered) {
+    winner = [...remainingTypes][0];
+    window.winner = winner;
+    chartRendered = true;
+    playVictorySound();
+    silenceSpriteLoops();
+    renderChart(fullGameData, 'finalGraph');   // inline;
+  }
+  // Display overlays
   drawCounters();
   fpsMonitor.draw();
 
   requestAnimationFrame(loop);
 }
+
 
 // ===============================
 // Reset Button Handler
