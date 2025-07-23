@@ -45,9 +45,9 @@ const GAME_FONT_FAMILY = 'Verdana, Tahoma, sans-serif';
 // Some of these values are only used in one place, but are retained to allow easy rebalancing.
 const DEFAULT_SPEED = 1.0;
 const DEFAULT_AGGRESSION = 60;
-const DEFAULT_DENSITY = 33; // Percentage of max sprites per type
+const DEFAULT_DENSITY = 25; // Percentage of max sprites per type
 
-const MAX_SPRITES_PER_TYPE = 150;
+const MAX_SPRITES_PER_TYPE = 200;
 const MIN_SPRITES_PER_TYPE = 1;
 
 const BASE_JITTER = 0.1;
@@ -340,9 +340,9 @@ function applyIdleDrift(sprite) {
   sprite.dx += (Math.random() - 0.5) * 0.05;
   sprite.dy += (Math.random() - 0.5) * 0.05;
 
-    // Clamp overall speed to prevent runaway drift
+  // Clamp overall speed to prevent runaway drift
   const mag = Math.hypot(sprite.dx, sprite.dy);
-  const maxIdleSpeed = 1; // or tweak as needed
+  const maxIdleSpeed = 0.5; // or tweak as needed
 
   if (mag > maxIdleSpeed) {
     sprite.dx = (sprite.dx / mag) * maxIdleSpeed;
