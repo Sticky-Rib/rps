@@ -1,3 +1,14 @@
+// ============================
+// Main Javascript for RPS Game
+// ----------------------------
+// This module coordinates the game loop, sprite management,
+// audio setup, and user interactions of the RPS simulation.
+// 
+// All code was integrated, understood, and tested by Simon Nitschke.
+// ChatGPT was used as a coding assistant for clarity, learning, and structure.
+// ============================
+
+
 import { initSound, updateSoundMix, cycleBackgroundTrack, playVictorySound, silenceSpriteLoops} from './sound.js';
 import { fpsMonitor } from './fps-monitor.js';
 
@@ -34,6 +45,7 @@ window.fullGameData = fullGameData;
 
 const GAME_FONT_FAMILY = 'Verdana, Tahoma, sans-serif';
 
+// Some of these values are only used in one place, but are retained to allow easy rebalancing.
 const DEFAULT_SPEED = 1.0;
 const DEFAULT_AGGRESSION = 60;
 const DEFAULT_DENSITY = 33; // Percentage of max sprites per type
@@ -100,16 +112,9 @@ const aggressionSlider = document.getElementById('aggressionSlider');
 const aggressionValue = document.getElementById('aggressionValue');
 
 aggressionSlider.value = DEFAULT_AGGRESSION;
-aggressionValue.textContent = `${DEFAULT_AGGRESSION}%`;
-aggressionRatio = 0.4 + (0.6 - 0.4) * (DEFAULT_AGGRESSION / 100);
+updateAggressionRatioFromSlider(); // Sets initial value and display
+aggressionSlider.addEventListener('input', updateAggressionRatioFromSlider);
 
-aggressionSlider.addEventListener('input', () => {
-  const sliderValue = parseInt(aggressionSlider.value);
-  aggressionValue.textContent = `${sliderValue}%`;
-
-  const ratio = sliderValue / 100;
-  aggressionRatio = 0.4 + (0.6 - 0.4) * ratio;
-});
 
 // --- Density Slider ---
 const densitySlider = document.getElementById('densitySlider');
@@ -134,6 +139,13 @@ function getSpriteCountFromSlider() {
   );
 }
 
+// Helper to update aggression ratio and label from slider
+function updateAggressionRatioFromSlider() {
+  const sliderValue = parseInt(aggressionSlider.value);
+  aggressionValue.textContent = `${sliderValue}%`;
+  const ratio = sliderValue / 100;
+  aggressionRatio = 0.4 + (0.6 - 0.4) * ratio;
+}
 
 // ===============================
 // Sprite Class & Sprite Management
@@ -204,7 +216,7 @@ draw() {
     this.type = type;
   }
 
-  moveTowardPreyAndAvoidPredator(others) {
+  moveTowardPreyAndAvoidPredator(others) { // core movement logic
     let preyTarget = null;
     let predatorThreat = null;
     let minPreyDist = Infinity;
@@ -242,7 +254,7 @@ draw() {
       moveY -= (predatorThreat.dy / predatorThreat.dist) * (1 - aggressionRatio);
     }
 
-    moveX += (Math.random() - 0.5) * BASE_JITTER;
+    moveX += (Math.random() - 0.5) * BASE_JITTER; // add some randomness to the movement to make the sim more organic
     moveY += (Math.random() - 0.5) * BASE_JITTER;
 
     const mag = Math.hypot(moveX, moveY);
@@ -259,9 +271,8 @@ draw() {
 const sprites = [];
 
 // ===============================
-// Sprite Utilities & Game State Helpers
+// Sprite Utilities & Helpers
 // ===============================
-
 
 // Reset all sprites and game state
 function resetSprites(count = 50) {
@@ -275,21 +286,19 @@ function resetSprites(count = 50) {
   }
 }
 
-// Adjust sprite count based on density slider
+// Adjust sprite count based on density slider - this method doesn't reset sprite positions for seemless transitions
 function adjustSpriteCount(perTypeCount) {
   const desiredTotal = perTypeCount * 3;
   const currentTotal = sprites.length;
 
-  if (currentTotal < desiredTotal) {
-    // Add new sprites, evenly by type
+  if (currentTotal < desiredTotal) { // Add new sprites, evenly by type
     const toAdd = desiredTotal - currentTotal;
     const types = ['rock', 'paper', 'scissors'];
     for (let i = 0; i < toAdd; i++) {
       const type = types[i % 3];
       sprites.push(new Sprite(type, Math.random() * canvas.width, Math.random() * canvas.height));
     }
-  } else if (currentTotal > desiredTotal) {
-    // Remove random sprites
+  } else if (currentTotal > desiredTotal) { // Remove random sprites to match desired count
     const toRemove = currentTotal - desiredTotal;
     for (let i = 0; i < toRemove; i++) {
       const index = Math.floor(Math.random() * sprites.length);
@@ -329,19 +338,6 @@ function drawCounters() {
   });
 }
 
-// Apply subtle drifting motion after victory
-function applyVictoryDrift(sprite) {
-  sprite.dx += (Math.random() - 0.5) * 0.05;
-  sprite.dy += (Math.random() - 0.5) * 0.05;
- 
-  const mag = Math.hypot(sprite.dx, sprite.dy);
-  if (mag > 0.5) {
-    sprite.dx *= 0.95;
-    sprite.dy *= 0.95;
-  }
-}
-resetSprites(50);
-
 // Apply idle drift to sprites when no interaction
 function applyIdleDrift(sprite) {
   sprite.dx += (Math.random() - 0.5) * 0.05;
@@ -362,7 +358,7 @@ function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   fpsMonitor.update();
 
-  if (!winner) {
+  if (!winner) { // If no winner, Game on!
     for (let sprite of sprites) {
       if (interactionEnabled) {
         sprite.moveTowardPreyAndAvoidPredator(sprites);
@@ -405,6 +401,8 @@ function loop() {
       rock: rockCount,
       paper: paperCount,
       scissors: scissorsCount
+      // Add Speed
+      // Add Aggression
     });
 
     // Update sound mix based on counts
@@ -422,16 +420,11 @@ function loop() {
       }
   }
 
-  // Animate victory
+  // Animate victory when there is a winner
   for (let sprite of sprites) {
     if (winner) {
-      applyVictoryDrift(sprite);
-    } else if (!interactionEnabled) {
       applyIdleDrift(sprite);
-    } else {
-      sprite.moveTowardPreyAndAvoidPredator(sprites);
     }
-
     sprite.update();
     sprite.draw();
   }
@@ -464,7 +457,7 @@ document.getElementById('resetButton').addEventListener('click', () => {
   const count = getSpriteCountFromSlider();
 
   speedMultiplier = speed;
-  aggressionRatio = 0.4 + (0.6 - 0.4) * (aggression / 100);
+  updateAggressionRatioFromSlider();
   winner = null;
   chartRendered = false;
 
