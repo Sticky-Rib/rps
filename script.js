@@ -9,7 +9,7 @@
 // ============================
 
 
-import { initSound, updateSoundMix, cycleBackgroundTrack, playVictorySound, silenceSpriteLoops} from './sound.js';
+import { initSound, preloadAudioAssets, updateSoundMix, cycleBackgroundTrack, playVictorySound, silenceSpriteLoops} from './sound.js';
 import { fpsMonitor } from './fps-monitor.js';
 
 // ===============================
@@ -83,6 +83,7 @@ const predatorOf = {
 // Audio Setup
 // ===============================
 
+preloadAudioAssets();
 document.body.addEventListener('click', () => {
   initSound();
 }, { once: true });

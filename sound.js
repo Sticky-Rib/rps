@@ -166,3 +166,26 @@ export function silenceSpriteLoops() { // Stop the sprite sound when the simulat
     }
   });
 }
+
+export async function preloadAudioAssets() {
+  const preloadList = [
+    'assets/background_loop.wav',
+    'assets/background_loop_alt1.wav',
+    'assets/silent_loop.wav',
+    'assets/rock_loop.wav',
+    'assets/paper_loop.wav',
+    'assets/scissors_loop.wav',
+    'assets/victory.wav'
+  ];
+
+  for (const file of preloadList) {
+    try {
+      const res = await fetch(file);
+      const buf = await res.arrayBuffer();
+      await audioContext.decodeAudioData(buf);
+      console.log(`📦 Preloaded: ${file}`);
+    } catch (err) {
+      console.warn(`⚠️ Failed to preload ${file}`, err);
+    }
+  }
+}
