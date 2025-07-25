@@ -154,7 +154,7 @@ class Sprite {
     this.x = x;
     this.y = y;
     this.radius = BASE_RADIUS;
-    this.speed = (3 + Math.random());
+    this.speed = (6 + Math.random());
     this.dx = Math.random() * 2 - 1;
     this.dy = Math.random() * 2 - 1;
   }
@@ -317,7 +317,7 @@ function drawCounters() {
   ctx.fillStyle = 'black';
 
   const spacing = 22;
-  const iconSize = 24; // you can tweak this
+  const iconSize = 24; // tweak this
   const marginLeft = 10;
   const textOffset = iconSize + 8;
 
@@ -342,7 +342,7 @@ function applyIdleDrift(sprite) {
 
   // Clamp overall speed to prevent runaway drift
   const mag = Math.hypot(sprite.dx, sprite.dy);
-  const maxIdleSpeed = 0.5; // or tweak as needed
+  const maxIdleSpeed = 0.5; // tweak as needed
 
   if (mag > maxIdleSpeed) {
     sprite.dx = (sprite.dx / mag) * maxIdleSpeed;
