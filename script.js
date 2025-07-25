@@ -154,7 +154,7 @@ class Sprite {
     this.x = x;
     this.y = y;
     this.radius = BASE_RADIUS;
-    this.speed = (1 + Math.random());
+    this.speed = (3 + Math.random());
     this.dx = Math.random() * 2 - 1;
     this.dy = Math.random() * 2 - 1;
   }
